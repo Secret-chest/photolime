@@ -54,6 +54,7 @@
                               <object class="GtkSearchEntry" id="installedSearchBar">
                                 <property name="visible">True</property>
                                 <property name="can-focus">True</property>
+                                <property name="progress-pulse-step">0</property>
                                 <property name="primary-icon-name">edit-find-symbolic</property>
                                 <property name="primary-icon-activatable">False</property>
                                 <property name="primary-icon-sensitive">False</property>
@@ -824,161 +825,101 @@
                             <property name="can-focus">False</property>
                             <property name="orientation">vertical</property>
                             <child>
-                              <object class="GtkStackSwitcher">
+                              <object class="GtkBox">
                                 <property name="visible">True</property>
                                 <property name="can-focus">False</property>
-                                <property name="homogeneous">True</property>
-                                <property name="icon-size">0</property>
-                                <property name="stack">modules</property>
+                                <child>
+                                  <object class="GtkSwitch" id="applyToAllImages">
+                                    <property name="visible">True</property>
+                                    <property name="can-focus">True</property>
+                                  </object>
+                                  <packing>
+                                    <property name="expand">False</property>
+                                    <property name="fill">True</property>
+                                    <property name="position">0</property>
+                                  </packing>
+                                </child>
+                                <child>
+                                  <object class="GtkLabel">
+                                    <property name="visible">True</property>
+                                    <property name="can-focus">False</property>
+                                    <property name="label" translatable="yes">Apply edits to all images</property>
+                                  </object>
+                                  <packing>
+                                    <property name="expand">False</property>
+                                    <property name="fill">True</property>
+                                    <property name="position">1</property>
+                                  </packing>
+                                </child>
                               </object>
                               <packing>
                                 <property name="expand">False</property>
-                                <property name="fill">False</property>
+                                <property name="fill">True</property>
                                 <property name="position">0</property>
                               </packing>
                             </child>
                             <child>
-                              <object class="GtkStack" id="modules">
+                              <object class="GtkListBox" id="modules">
                                 <property name="visible">True</property>
                                 <property name="can-focus">False</property>
-                                <child>
-                                  <object class="GtkListBox" id="thisImageModules">
+                                <property name="selection-mode">browse</property>
+                                <child type="placeholder">
+                                  <object class="GtkBox">
                                     <property name="visible">True</property>
                                     <property name="can-focus">False</property>
-                                    <property name="selection-mode">browse</property>
-                                    <child type="placeholder">
-                                      <object class="GtkBox">
+                                    <property name="valign">center</property>
+                                    <property name="margin-start">8</property>
+                                    <property name="margin-end">8</property>
+                                    <property name="margin-top">4</property>
+                                    <property name="margin-bottom">4</property>
+                                    <property name="vexpand">True</property>
+                                    <property name="orientation">vertical</property>
+                                    <property name="spacing">4</property>
+                                    <child>
+                                      <object class="GtkImage">
                                         <property name="visible">True</property>
                                         <property name="can-focus">False</property>
-                                        <property name="valign">center</property>
-                                        <property name="margin-start">8</property>
-                                        <property name="margin-end">8</property>
-                                        <property name="margin-top">4</property>
-                                        <property name="margin-bottom">4</property>
-                                        <property name="vexpand">True</property>
-                                        <property name="orientation">vertical</property>
-                                        <property name="spacing">4</property>
-                                        <child>
-                                          <object class="GtkImage">
-                                            <property name="visible">True</property>
-                                            <property name="can-focus">False</property>
-                                            <property name="icon-name">dialog-error</property>
-                                            <property name="icon_size">6</property>
-                                          </object>
-                                          <packing>
-                                            <property name="expand">False</property>
-                                            <property name="fill">True</property>
-                                            <property name="position">0</property>
-                                          </packing>
-                                        </child>
-                                        <child>
-                                          <object class="GtkLabel">
-                                            <property name="visible">True</property>
-                                            <property name="can-focus">False</property>
-                                            <property name="label" translatable="yes">No modules available</property>
-                                            <property name="justify">center</property>
-                                            <property name="wrap">True</property>
-                                            <attributes>
-                                              <attribute name="weight" value="semibold"/>
-                                              <attribute name="size" value="16384"/>
-                                            </attributes>
-                                          </object>
-                                          <packing>
-                                            <property name="expand">False</property>
-                                            <property name="fill">True</property>
-                                            <property name="position">1</property>
-                                          </packing>
-                                        </child>
-                                        <child>
-                                          <object class="GtkButton">
-                                            <property name="label" translatable="yes">Manage modules</property>
-                                            <property name="visible">True</property>
-                                            <property name="can-focus">True</property>
-                                            <property name="receives-default">True</property>
-                                          </object>
-                                          <packing>
-                                            <property name="expand">False</property>
-                                            <property name="fill">True</property>
-                                            <property name="position">2</property>
-                                          </packing>
-                                        </child>
+                                        <property name="icon-name">dialog-error</property>
+                                        <property name="icon_size">6</property>
                                       </object>
+                                      <packing>
+                                        <property name="expand">False</property>
+                                        <property name="fill">True</property>
+                                        <property name="position">0</property>
+                                      </packing>
                                     </child>
-                                  </object>
-                                  <packing>
-                                    <property name="name">this</property>
-                                    <property name="title" translatable="yes">This image</property>
-                                  </packing>
-                                </child>
-                                <child>
-                                  <object class="GtkListBox" id="allImagesModules">
-                                    <property name="visible">True</property>
-                                    <property name="can-focus">False</property>
-                                    <property name="selection-mode">browse</property>
-                                    <child type="placeholder">
-                                      <object class="GtkBox">
+                                    <child>
+                                      <object class="GtkLabel">
                                         <property name="visible">True</property>
                                         <property name="can-focus">False</property>
-                                        <property name="valign">center</property>
-                                        <property name="margin-start">8</property>
-                                        <property name="margin-end">8</property>
-                                        <property name="margin-top">4</property>
-                                        <property name="margin-bottom">4</property>
-                                        <property name="vexpand">True</property>
-                                        <property name="orientation">vertical</property>
-                                        <property name="spacing">4</property>
-                                        <child>
-                                          <object class="GtkImage">
-                                            <property name="visible">True</property>
-                                            <property name="can-focus">False</property>
-                                            <property name="icon-name">dialog-error</property>
-                                            <property name="icon_size">6</property>
-                                          </object>
-                                          <packing>
-                                            <property name="expand">False</property>
-                                            <property name="fill">True</property>
-                                            <property name="position">0</property>
-                                          </packing>
-                                        </child>
-                                        <child>
-                                          <object class="GtkLabel">
-                                            <property name="visible">True</property>
-                                            <property name="can-focus">False</property>
-                                            <property name="label" translatable="yes">No modules available</property>
-                                            <property name="justify">center</property>
-                                            <property name="wrap">True</property>
-                                            <attributes>
-                                              <attribute name="weight" value="semibold"/>
-                                              <attribute name="size" value="16384"/>
-                                            </attributes>
-                                          </object>
-                                          <packing>
-                                            <property name="expand">False</property>
-                                            <property name="fill">True</property>
-                                            <property name="position">1</property>
-                                          </packing>
-                                        </child>
-                                        <child>
-                                          <object class="GtkButton">
-                                            <property name="label" translatable="yes">Manage modules</property>
-                                            <property name="visible">True</property>
-                                            <property name="can-focus">True</property>
-                                            <property name="receives-default">True</property>
-                                          </object>
-                                          <packing>
-                                            <property name="expand">False</property>
-                                            <property name="fill">True</property>
-                                            <property name="position">2</property>
-                                          </packing>
-                                        </child>
+                                        <property name="label" translatable="yes">No modules available</property>
+                                        <property name="justify">center</property>
+                                        <property name="wrap">True</property>
+                                        <attributes>
+                                          <attribute name="weight" value="semibold"/>
+                                          <attribute name="size" value="16384"/>
+                                        </attributes>
                                       </object>
+                                      <packing>
+                                        <property name="expand">False</property>
+                                        <property name="fill">True</property>
+                                        <property name="position">1</property>
+                                      </packing>
+                                    </child>
+                                    <child>
+                                      <object class="GtkButton">
+                                        <property name="label" translatable="yes">Manage modules</property>
+                                        <property name="visible">True</property>
+                                        <property name="can-focus">True</property>
+                                        <property name="receives-default">True</property>
+                                      </object>
+                                      <packing>
+                                        <property name="expand">False</property>
+                                        <property name="fill">True</property>
+                                        <property name="position">2</property>
+                                      </packing>
                                     </child>
                                   </object>
-                                  <packing>
-                                    <property name="name">all</property>
-                                    <property name="title" translatable="yes">Selected</property>
-                                    <property name="position">1</property>
-                                  </packing>
                                 </child>
                               </object>
                               <packing>

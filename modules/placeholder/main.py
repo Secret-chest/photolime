@@ -1,8 +1,8 @@
 # Photolime metadata for GUI
 METADATA = {
-            "name": "Another placeholder",
-            "icon": ("GtkIcon", "cs-color"),
-            "description": "Just a test"
+            "name": "Static generator",
+            "icon": ("GtkIcon", "image-denoise-symbolic"),
+            "description": "Generate random static noise image"
            }
 
 import PIL

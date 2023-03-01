@@ -1,9 +1,10 @@
 import numpy
 from PIL import Image
 import math
+import os
+import importlib
 
 import gi
-
 gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk, GdkPixbuf, GLib
 
@@ -18,6 +19,8 @@ zoomFactor = 1
 gtkImage = builder.get_object("image")
 zoomValue = builder.get_object("zoomValue")
 zoomIndicator = builder.get_object("zoomIndicator")
+
+moduleList = builder.get_object("modules")
 
 static = numpy.random.rand(512, 512, 3) * 256
 image = Image.fromarray(static.astype("uint8")).convert("1").convert("RGB")
@@ -61,6 +64,18 @@ def zoomFit(event):
     render(None)
 
 
+def refreshModules():
+    print("Loading modules")
+    for d in os.listdir("./modules"):
+        print(f"Loading module {d}")
+        module = importlib.import_module(f"modules.{d}.main")
+        button = Gtk.Button.new_with_label(getattr(module, "METADATA")["name"])
+        # TODO add button handler
+        button.show()
+        moduleList.insert(button, -1)
+
+
+refreshModules()
 render(None)
 
 handlers = {
