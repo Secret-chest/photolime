@@ -14,6 +14,8 @@ builder.add_from_file("main.glade")
 window = builder.get_object("root")
 window.show_all()
 
+operation = None
+
 zoomFactor = 1
 
 gtkImage = builder.get_object("image")
@@ -22,8 +24,10 @@ zoomIndicator = builder.get_object("zoomIndicator")
 
 moduleList = builder.get_object("modules")
 
-static = numpy.random.rand(512, 512, 3) * 256
-image = Image.fromarray(static.astype("uint8")).convert("1").convert("RGB")
+# static = numpy.random.rand(512, 512, 3) * 256
+# image = Image.fromarray(static.astype("uint8")).convert("1").convert("RGB")
+
+image = Image.open("test.jpg")
 
 
 def render(event):
@@ -64,13 +68,30 @@ def zoomFit(event):
     render(None)
 
 
+def modifyImage():
+    global image, operation
+    if operation and operation.ready:
+        print("Getting new image")
+        image = operation.image
+        operation = None
+    render(None)
+    return True
+
+
+def openModule(trigger, module):
+    global image, operation
+    operation = getattr(module, "Operation")(image)
+    render(None)
+
+
 def refreshModules():
     print("Loading modules")
     for d in os.listdir("./modules"):
         print(f"Loading module {d}")
         module = importlib.import_module(f"modules.{d}.main")
         button = Gtk.Button.new_with_label(getattr(module, "METADATA")["name"])
-        # TODO add button handler
+
+        button.connect("clicked", openModule, module)
         button.show()
         moduleList.insert(button, -1)
 
@@ -87,6 +108,8 @@ handlers = {
     "zoom-fit": zoomFit,
 }
 builder.connect_signals(handlers)
+
+GLib.idle_add(modifyImage)
 
 if __name__ == '__main__':
     Gtk.main()
