@@ -34,7 +34,7 @@ moduleList = builder.get_object("modules")
 static = numpy.random.rand(16, 16, 3) * 256
 image = Image.fromarray(static.astype("uint8")).convert("1").convert("RGB")
 
-filePath = ""
+filePath = "Untitled"
 
 
 def render(event):
@@ -47,6 +47,7 @@ def render(event):
                                             scaledImage.height, len(scaledImage.getbands()) * scaledImage.width)
     zoomIndicator.set_text(f"{round(100 * zoomFactor)}%")
     gtkImage.set_from_pixbuf(pixbuf)
+    window.set_title(f"{filePath} - photolime")
 
 
 def loadFile(path):
@@ -106,7 +107,8 @@ def askForLoad(event):
         dialog.destroy()
         return filePath
     else:
-        pass
+        dialog.destroy()
+        return None
 
 
 def askForSave(event):
@@ -154,7 +156,8 @@ def askForSave(event):
         print(tempPath)
         return tempPath
     else:
-        pass
+        dialog.destroy()
+        return None
 
 def saveOver(event):
     print(filePath)
@@ -219,6 +222,7 @@ def refreshModules():
         print(f"Loading module {d}")
         module = importlib.import_module(f"modules.{d}.main")
         button = Gtk.Button.new_with_label(getattr(module, "METADATA")["name"])
+        button.set_tooltip_text(getattr(module, "METADATA")["description"])
 
         button.connect("clicked", openModule, module)
         button.show()
