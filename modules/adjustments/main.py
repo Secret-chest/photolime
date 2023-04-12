@@ -1,14 +1,14 @@
 # Photolime metadata for GUI
 METADATA = {
-    "name": "RGB mixer",
-    "id": "rgb-mixer",
-    "icon": ("GtkIcon", "color-profile"),
-    "description": "Set RGB channel values"
+    "name": "Adjustments",
+    "id": "adjustments",
+    "icon": ("GtkIcon", "image"),
+    "description": "Contrast, saturation, lightness and more"
 }
 
 import PIL
 import numpy
-from PIL import Image, ImageDraw
+from PIL import Image, ImageDraw, ImageEnhance
 
 import gi
 gi.require_version("Gtk", "3.0")
@@ -24,17 +24,19 @@ class Operation:
 
         self.builder = builder
 
-        self.red = builder.get_object("red")
-        self.green = builder.get_object("green")
-        self.blue = builder.get_object("blue")
+        self.brightness = builder.get_object("brightness")
+        self.contrast = builder.get_object("contrast")
+        self.saturation = builder.get_object("saturation")
+        self.sharpness = builder.get_object("sharpness")
 
         def apply(event):
             self.process()
 
         def reset(event):
-            self.red.set_value(0)
-            self.green.set_value(0)
-            self.blue.set_value(0)
+            self.brightness.set_value(0)
+            self.contrast.set_value(0)
+            self.saturation.set_value(0)
+            self.sharpness.set_value(0)
 
         def cancel(event):
             window.destroy()
@@ -54,26 +56,25 @@ class Operation:
     def process(self) -> Image:
         print("Modifying image!")
 
-        red = self.builder.get_object("red")
-        green = self.builder.get_object("green")
-        blue = self.builder.get_object("blue")
-
-        redValue = red.get_value() / 100 + 1
-        greenValue = green.get_value() / 100 + 1
-        blueValue = blue.get_value() / 100 + 1
+        brightness = self.builder.get_object("brightness").get_value() / 100 + 1
+        contrast = self.builder.get_object("contrast").get_value() / 100 + 1
+        saturation = self.builder.get_object("saturation").get_value() / 100 + 1
+        sharpness = self.builder.get_object("sharpness").get_value() / 100 + 1
 
         pixels = self.image.load()
-        image = Image.new("RGB", self.image.size)
-        draw = ImageDraw.Draw(image)
+        image = self.image.copy()
 
-        # Recolour each pixel and draw it
-        for x in range(image.width):
-            for y in range(image.height):
-                r, g, b = pixels[x, y]
-                r = round(r * redValue)
-                g = round(g * greenValue)
-                b = round(b * blueValue)
-                draw.point((x, y), (r, g, b))
+        brightnessEnhancer = ImageEnhance.Brightness(image)
+        image = brightnessEnhancer.enhance(brightness)
+
+        contrastEnhancer = ImageEnhance.Contrast(image)
+        image = contrastEnhancer.enhance(contrast)
+
+        saturationEnhancer = ImageEnhance.Color(image)
+        image = saturationEnhancer.enhance(saturation)
+
+        sharpnessEnhancer = ImageEnhance.Sharpness(image)
+        image = sharpnessEnhancer.enhance(sharpness)
 
         self.image = image
         self.ready = True
