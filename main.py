@@ -6,11 +6,16 @@ import math
 import os
 import importlib
 import warnings
+import history
+
 warnings.filterwarnings("ignore")
 
 import gi
 gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk, GdkPixbuf, GLib
+
+MAX_HISTORY_SIZE = 32
+UPDATE_RATE = 20
 
 print(f"Running Pillow {PIL.__version__}")
 
@@ -36,6 +41,8 @@ image = Image.fromarray(static.astype("uint8")).convert("1").convert("RGB")
 
 filePath = "Untitled"
 
+imageHistory = history.History(MAX_HISTORY_SIZE)
+
 
 def render(event):
     zoomFactor = 2 ** zoomValue.get_value()
@@ -53,6 +60,7 @@ def render(event):
 def loadFile(path):
     global image
     image = Image.open(path)
+    imageHistory.add(image)
     render(None)
 
 
@@ -159,6 +167,7 @@ def askForSave(event):
         dialog.destroy()
         return None
 
+
 def saveOver(event):
     print(filePath)
     saveFile(filePath)
@@ -205,9 +214,26 @@ def modifyImage():
     if operation and operation.ready:
         print("Getting new image")
         image = operation.image
+        imageHistory.add(image)
         operation = None
         render(None)
     return True
+
+
+def undo(event):
+    print("Undoing")
+    global image
+    if not imageHistory.isEmpty():
+        print("Getting last image")
+        file = open(imageHistory.undo())
+        data = file.read()
+        image = Image.frombytes(data)
+
+
+def redo(event):
+    global image
+    if not imageHistory.isEmpty():
+        image = imageHistory.redo()
 
 
 def openModule(trigger, module):
@@ -243,12 +269,14 @@ handlers = {
     "save-as": saveAs,
     "save-copy": askForSave,
     "open": askForLoad,
+    "undo": undo,
+    "redo": redo,
 }
 builder.connect_signals(handlers)
 
 window.show_all()
 
-GLib.idle_add(modifyImage)
+GLib.timeout_add(UPDATE_RATE, modifyImage)
 
 if __name__ == '__main__':
     Gtk.main()
