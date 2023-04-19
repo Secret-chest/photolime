@@ -1,5 +1,6 @@
 import tempfile
 import os
+from PIL import Image
 
 
 class History():
@@ -10,32 +11,38 @@ class History():
         self.currentSize = 0
         self.h = []
 
-    def add(self, item):
-        item = item.tobytes()
+    def add(self, item: Image):
         file = tempfile.mkstemp(prefix=self.prefix)
-        with open(file[1], "wb") as f:
-            f.write(item)
+        # write image using PNG format
+        item.save(file[1], format="PNG")
+        print(f"Saved history item as {file[1]}")
         if self.currentSize == self.maxSize and self.pos == self.maxSize - 1:
-            del self.h[0]
+            os.remove(self.h.pop(0))
             self.pos -= 1
             self.currentSize -= 1
-        del self.h[self.pos + 1:]
-        self.h.insert(self.pos, file[1])
+
+        while self.pos > self.currentSize:
+            os.remove(self.h.pop())
+            self.currentSize -= 1
+
+        self.h.append(file[1])
         self.pos += 1
         self.currentSize += 1
-        # FIXME
 
     def undo(self):
-        self.pos = min(self.pos - 1, 0)
-        return self.h[self.pos]
+        self.pos = max(self.pos - 1, 0)
+        image = Image.open(self.h[self.pos], formats=["PNG"])
+        return image
 
     def redo(self):
-        self.pos = max(self.pos + 1, self.currentSize)
-        return self.h[self.pos]
+        self.pos = min(self.pos + 1, self.currentSize - 1)
+        print(self.pos)
+        image = Image.open(self.h[self.pos], formats=["PNG"])
+        return image
 
     def isEmpty(self):
         return self.currentSize == 0
 
     def clear(self):
-        for i in self.h:
-            os.remove(i)
+        for file in h:
+            os.remove(file)

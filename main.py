@@ -1,3 +1,4 @@
+import atexit
 import numpy
 from PIL import Image
 import formats
@@ -221,19 +222,18 @@ def modifyImage():
 
 
 def undo(event):
-    print("Undoing")
     global image
+    print("Undoing")
     if not imageHistory.isEmpty():
-        print("Getting last image")
-        file = open(imageHistory.undo())
-        data = file.read()
-        image = Image.frombytes(data)
+        image = imageHistory.undo()
+    render(None)
 
 
 def redo(event):
     global image
     if not imageHistory.isEmpty():
         image = imageHistory.redo()
+    render(None)
 
 
 def openModule(trigger, module):
@@ -277,6 +277,9 @@ builder.connect_signals(handlers)
 window.show_all()
 
 GLib.timeout_add(UPDATE_RATE, modifyImage)
+
+atexit.register(lambda: print("Exit"))
+atexit.register(imageHistory.clear)
 
 if __name__ == '__main__':
     Gtk.main()
