@@ -13,7 +13,7 @@ warnings.filterwarnings("ignore")
 
 import gi
 gi.require_version("Gtk", "3.0")
-from gi.repository import Gtk, GdkPixbuf, GLib
+from gi.repository import Gtk, GdkPixbuf, GLib, Gdk
 
 MAX_HISTORY_SIZE = 32
 UPDATE_RATE = 20
@@ -44,15 +44,20 @@ filePath = "Untitled"
 
 imageHistory = history.History(MAX_HISTORY_SIZE)
 
+print(dir(Gdk))
+
 
 def render(event):
     zoomFactor = 2 ** zoomValue.get_value()
-    scaledImage = image.resize((round(image.width * zoomFactor), round(image.height * zoomFactor)),
-                               resample=Image.NEAREST)
+    # scaledImage = image.resize((round(image.width * zoomFactor), round(image.height * zoomFactor)),
+    #                            resample=Image.NEAREST)
 
-    glibBytes = GLib.Bytes.new(scaledImage.tobytes())
-    pixbuf = GdkPixbuf.Pixbuf.new_from_data(glibBytes.get_data(), GdkPixbuf.Colorspace.RGB, False, 8, scaledImage.width,
-                                            scaledImage.height, len(scaledImage.getbands()) * scaledImage.width)
+    glibBytes = GLib.Bytes.new(image.tobytes())
+    pixbuf = GdkPixbuf.Pixbuf.new_from_data(glibBytes.get_data(), GdkPixbuf.Colorspace.RGB, False, 8,
+                                            image.width, image.height,
+                                            len(image.getbands()) * image.width)
+    pixbuf = pixbuf.scale_simple(image.width * zoomFactor, image.height * zoomFactor, GdkPixbuf.InterpType.NEAREST)
+
     zoomIndicator.set_text(f"{round(100 * zoomFactor)}%")
     gtkImage.set_from_pixbuf(pixbuf)
     window.set_title(f"{filePath} - photolime")
@@ -223,7 +228,7 @@ def modifyImage():
 
 def undo(event):
     global image
-    print("Undoing")
+    print(f"Undoing ({imageHistory.pos}/{imageHistory.currentSize})")
     if not imageHistory.isEmpty():
         image = imageHistory.undo()
     render(None)
@@ -231,6 +236,7 @@ def undo(event):
 
 def redo(event):
     global image
+    print(f"Redoing ({imageHistory.pos}/{imageHistory.currentSize})")
     if not imageHistory.isEmpty():
         image = imageHistory.redo()
     render(None)

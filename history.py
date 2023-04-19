@@ -7,7 +7,7 @@ class History():
     def __init__(self, maxSize, prefix="photolime-history_"):
         self.maxSize = maxSize
         self.prefix = prefix
-        self.pos = 0
+        self.pos = -1
         self.currentSize = 0
         self.h = []
 
@@ -21,13 +21,14 @@ class History():
             self.pos -= 1
             self.currentSize -= 1
 
-        while self.pos > self.currentSize:
+        while self.pos != self.currentSize - 1 and self.currentSize:
             os.remove(self.h.pop())
             self.currentSize -= 1
 
         self.h.append(file[1])
         self.pos += 1
         self.currentSize += 1
+        print(f"Adding new item ({self.pos}/{self.currentSize})")
 
     def undo(self):
         self.pos = max(self.pos - 1, 0)
@@ -36,7 +37,6 @@ class History():
 
     def redo(self):
         self.pos = min(self.pos + 1, self.currentSize - 1)
-        print(self.pos)
         image = Image.open(self.h[self.pos], formats=["PNG"])
         return image
 
@@ -44,5 +44,6 @@ class History():
         return self.currentSize == 0
 
     def clear(self):
-        for file in h:
+        for file in self.h:
+            print(file)
             os.remove(file)
