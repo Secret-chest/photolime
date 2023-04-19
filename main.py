@@ -44,7 +44,6 @@ filePath = "Untitled"
 
 imageHistory = history.History(MAX_HISTORY_SIZE)
 
-print(dir(Gdk))
 
 
 def render(event):

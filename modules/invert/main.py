@@ -8,7 +8,7 @@ METADATA = {
 
 import PIL
 import numpy
-from PIL import Image, ImageDraw
+from PIL import Image, ImageOps
 
 
 class Operation:
@@ -20,21 +20,7 @@ class Operation:
     def process(self) -> Image:
         print("Modifying image!")
 
-        image = self.image
-
-        w = image.width
-        h = image.height
-
-        pixels = image.load()
-        draw = ImageDraw.Draw(image)
-
-        for x in range(w):
-            for y in range(h):
-                r, g, b = pixels[x, y]
-                r = 255 - r
-                g = 255 - g
-                b = 255 - b
-                draw.point((x, y), (r, g, b))
+        image = ImageOps.invert(self.image)
 
         self.image = image
         self.ready = True

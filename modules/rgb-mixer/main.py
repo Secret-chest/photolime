@@ -8,7 +8,7 @@ METADATA = {
 
 import PIL
 import numpy
-from PIL import Image, ImageDraw
+from PIL import Image
 
 import gi
 gi.require_version("Gtk", "3.0")
@@ -62,18 +62,16 @@ class Operation:
         greenValue = green.get_value() / 100 + 1
         blueValue = blue.get_value() / 100 + 1
 
-        pixels = self.image.load()
-        image = Image.new("RGB", self.image.size)
-        draw = ImageDraw.Draw(image)
+        r, g, b = self.image.split()
 
-        # Recolour each pixel and draw it
-        for x in range(image.width):
-            for y in range(image.height):
-                r, g, b = pixels[x, y]
-                r = round(r * redValue)
-                g = round(g * greenValue)
-                b = round(b * blueValue)
-                draw.point((x, y), (r, g, b))
+        if redValue:
+            r = r.point(lambda i: round(i * redValue))
+        if greenValue:
+            g = g.point(lambda i: round(i * greenValue))
+        if blueValue:
+            b = b.point(lambda i: round(i * blueValue))
+
+        image = Image.merge("RGB", (r, g, b))
 
         self.image = image
         self.ready = True
