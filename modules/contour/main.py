@@ -1,9 +1,9 @@
 # Photolime metadata for GUI
 METADATA = {
-    "name": "Emboss",
-    "id": "Emboss",
+    "name": "Contour",
+    "id": "contour",
     "icon": ("GtkIcon", "edit-symbolic"),
-    "description": "Emboss filter"
+    "description": "Contour the image.\nUse with blur to create less lines"
 }
 
 import PIL
@@ -20,7 +20,7 @@ class Operation:
     def process(self) -> Image:
         print("Modifying image!")
 
-        image = self.image.filter(ImageFilter.EMBOSS)
+        image = self.image.filter(ImageFilter.FIND_EDGES)
 
         self.image = image
         self.ready = True
